@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+var Fingerprint = require('express-fingerprint')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -18,6 +19,39 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+var mongo = require('mongodb');
+var monk = require('monk');
+var db = monk('localhost:27017/nodetest1');
+
+// Make our db accessible to our router
+app.use(function(req,res,next){
+    req.db = db;
+    next();
+});
+
+app.use(Fingerprint({
+	parameters:[
+		// Defaults
+		Fingerprint.useragent,
+		Fingerprint.acceptHeaders,
+		Fingerprint.geoip,
+
+		// Additional parameters
+		function(next) {
+			// ...do something...
+			next(null,{
+			'param1':'value1'
+			})
+		},
+		function(next) {
+			// ...do something...
+			next(null,{
+			'param2':'value2'
+			})
+		},
+	]
+}))
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -38,4 +72,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// app.get('*',function(req,res,next) {
+// 	// Fingerprint object
+// 	console.log(req.fingerprint)
+// })
+
 module.exports = app;
+
+
