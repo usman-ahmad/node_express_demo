@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 
 var geoip =  require('geoip-lite')
+var useragent  = require('useragent')
 // import geoip from 'geoip-lite'
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -38,23 +39,36 @@ app.use(Fingerprint({
 		// Defaults
 		Fingerprint.useragent,
 		Fingerprint.acceptHeaders,
-		Fingerprint.geoip,
 
-		// Additional parameters
+		// Fingerprint.geoip,
 		function(next) {
 			// ...do something...
+			const geo = geoip.lookup(this.req.ip)
 			next(null,{
-			'ip':this.req.ip
+				geo: {
+				'ip':this.req.ip,
+				'city': geo ? geo.city : null,
+				'region': geo ? geo.region : null,
+				'metro': geo ? geo.metro : null,
+				'zip': geo ? geo.zip : null,
+				'lat': geo ? geo.ll[0] : null,
+				'long': geo ? geo.ll[1] : null
+				}
 			})
 		},
 		function(next) {
-			const geo = geoip.lookup(this.req.ip)
-		
-			// console.log('Fingerprint.useragent', Fingerprint.useragent.useragent.browser);
+			
+			const agent = useragent.parse(this.req.headers['user-agent'])
+			
+			console.log('agent', agent.toJSON());
+			
+			console.log('this.req.headers',this.req.headers);
+
 			// ...do something...
 			next(null,{
-			'city': geo ? geo.city : null
-			})
+				useragent: agent.toJSON()
+				}
+			)
 		},
 	]
 }))
