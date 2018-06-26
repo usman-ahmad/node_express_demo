@@ -41,7 +41,7 @@ app.use(Fingerprint({
 		function(next) {
 			// ...do something...
 			next(null,{
-			'param1':'value1'
+			'ip':this.req.ip
 			})
 		},
 		function(next) {
