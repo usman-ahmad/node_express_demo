@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
+var geoip =  require('geoip-lite')
+// import geoip from 'geoip-lite'
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -45,9 +48,12 @@ app.use(Fingerprint({
 			})
 		},
 		function(next) {
+			const geo = geoip.lookup(this.req.ip)
+		
+			// console.log('Fingerprint.useragent', Fingerprint.useragent.useragent.browser);
 			// ...do something...
 			next(null,{
-			'param2':'value2'
+			'city': geo ? geo.country : null
 			})
 		},
 	]
