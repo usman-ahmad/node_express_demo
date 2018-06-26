@@ -53,7 +53,7 @@ app.use(Fingerprint({
 			// console.log('Fingerprint.useragent', Fingerprint.useragent.useragent.browser);
 			// ...do something...
 			next(null,{
-			'city': geo ? geo.country : null
+			'city': geo ? geo.city : null
 			})
 		},
 	]
